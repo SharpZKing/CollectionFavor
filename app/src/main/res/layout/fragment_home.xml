@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.sharp.fragments.HomeFragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/home_add_url"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center_vertical"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/clip_64"/>
+
+        <LinearLayout
+            android:paddingLeft="5dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="将剪切板中的网址添加到收藏夹？"/>
+
+            <TextView
+                android:id="@+id/home_tv_url"
+                android:layout_marginTop="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:text="http://www.baidu.com"/>
+
+
+        </LinearLayout>
+
+        <Button
+            android:layout_gravity="center_vertical"
+            android:id="@+id/home_add_btn"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/button_bg"
+            android:text="添加"/>
+
+    </LinearLayout>
+
+    <View
+        android:background="#999"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/home_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">CollectionFavor</string>
+    <string name="behavior_footer">com.sharp.customview.FooterBehavior</string>
+    <string name="behavior_footer2">com.sharp.customview.FooterBehaviorDependAppBar</string>
+
+    <string name="behavior_my_fab">com.sharp.customview.ScaleDownShowBehavior</string>
+    <string name="behavior_my_fab_behavior">com.sharp.customview.MyFabBehavior</string>
+
+    <string name="appId">92b467886c6f5939ae0acf311cc2b31e</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

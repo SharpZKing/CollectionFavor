@@ -27,7 +27,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/item_title"
+                android:id="@+id/item_discovery_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
@@ -35,29 +35,38 @@
                 android:text="这是一个大标题"
                 android:textSize="18sp"/>
 
-            <TextView
-                android:id="@+id/item_time"
-                android:layout_marginBottom="10dp"
+            <LinearLayout
+                android:id="@+id/add_to_item"
                 android:layout_gravity="bottom"
-                android:gravity="bottom"
+                android:layout_marginBottom="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="14sp"
-                android:text="2017年6月11日"
-                />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_gravity="bottom"
+                    android:gravity="bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textSize="14sp"
+                    android:text="--From Zhihu"
+                    />
+
+               <!-- <ImageView
+                    android:layout_marginBottom="1dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="6dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@mipmap/ic_launcher"/>-->
+
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <!--<TextView
-            android:id="@+id/base_swipe_item_title"
-            android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_weight="1"
-            android:gravity="left|center_vertical"
-            android:textSize="21sp" />-->
-
         <ImageView
-            android:id="@+id/item_icon"
+            android:id="@+id/item_news_icon"
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:layout_marginTop="2dp"

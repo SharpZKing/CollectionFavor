@@ -31,6 +31,38 @@
             android:layout_height="1dp"
             android:background="#e9e9e9"/>
 
+        <LinearLayout
+            android:background="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp">
+
+            <ImageView
+                android:layout_gravity="center_vertical"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/about_us"/>
+
+            <TextView
+                android:id="@+id/setting_aboutus"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:textColor="#515151"
+                android:textStyle="bold"
+                android:text="关于我们"/>
+
+        </LinearLayout>
+
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e9e9e9"/>
+
         <TextView
             android:id="@+id/setting_logout"
             android:gravity="center"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CollectionFavor</string>
+    <string name="app_name">微兜</string>
     <string name="behavior_footer">com.sharp.customview.FooterBehavior</string>
     <string name="behavior_footer2">com.sharp.customview.FooterBehaviorDependAppBar</string>
 

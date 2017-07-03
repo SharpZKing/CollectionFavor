@@ -1,5 +1,6 @@
 package com.sharp.collectionfavor;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
 
     private Toolbar mToolbar;
 
+    private TextView mAbout;
     private TextView mLogout;
 
     @Override
@@ -34,6 +36,9 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
+        mAbout = (TextView) findViewById(R.id.setting_aboutus);
+        mAbout.setOnClickListener(this);
+
         mLogout = (TextView) findViewById(R.id.setting_logout);
         mLogout.setOnClickListener(this);
 
@@ -51,6 +56,12 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 BmobUser.logOut();
                 Toast.makeText(SettingActivity.this, "退出账号成功!", Toast.LENGTH_SHORT).show();
                 finish();
+                break;
+            case R.id.setting_aboutus:
+
+                Intent intent = new Intent(SettingActivity.this, AboutUsActivity.class);
+                startActivity(intent);
+
                 break;
         }
     }

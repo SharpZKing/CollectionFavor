@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,14 +23,19 @@ import android.widget.Toast;
 import com.sharp.collectionfavor.LoginActivity;
 import com.sharp.collectionfavor.R;
 import com.sharp.collectionfavor.SettingActivity;
+import com.sharp.entity.Collection;
 import com.sharp.entity.User;
+import com.sharp.util.ConstUtil;
 import com.sharp.util.SharedUtil;
 import com.sharp.util.ToolUtil;
 import com.sharp.views.CustomDialog;
 
 import java.io.File;
 
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.CountListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -44,6 +51,7 @@ public class AccountFragment extends Fragment implements View.OnClickListener{
     private TextView mUsernameTv;
     private TextView mDescTv;
     private TextView mEmailTv;
+    private TextView mCollectionNumbers;
     private TextView mSetting;
 
     private CircleImageView mProfile;
@@ -52,6 +60,21 @@ public class AccountFragment extends Fragment implements View.OnClickListener{
     private Button mCancel;
     private Button mCamera;
     private Button mPicture;
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            switch (msg.what){
+                case ConstUtil.COUNT_COLLECTIONS:
+                    int n = (int) msg.obj;
+                    mCollectionNumbers.setText( "我的收藏数 ( " + n + " ) ");
+                    break;
+            }
+
+        }
+    };
 
 //    private User currentUser = null;
 
@@ -80,6 +103,7 @@ public class AccountFragment extends Fragment implements View.OnClickListener{
         mUsernameTv = (TextView) view.findViewById(R.id.account_username);
         mDescTv = (TextView) view.findViewById(R.id.account_desc);
         mEmailTv = (TextView) view.findViewById(R.id.account_email);
+        mCollectionNumbers = (TextView) view.findViewById(R.id.collection_numbers);
         mSetting = (TextView) view.findViewById(R.id.account_setting);
         mSetting.setOnClickListener(this);
 
@@ -108,6 +132,19 @@ public class AccountFragment extends Fragment implements View.OnClickListener{
             mUsernameTv.setText((String)BmobUser.getObjectByKey("username"));
             mDescTv.setText((String)BmobUser.getObjectByKey("desc"));
             mEmailTv.setText("邮箱 ( " + (String)BmobUser.getObjectByKey("email") + " )" );
+
+            BmobQuery<Collection> query = new BmobQuery<>();
+            query.addWhereEqualTo("userId", BmobUser.getCurrentUser().getObjectId());
+            query.addWhereEqualTo("liked", 1);
+            query.count(Collection.class, new CountListener() {
+                @Override
+                public void done(Integer counts, BmobException e) {
+                    Message message = new Message();
+                    message.what = ConstUtil.COUNT_COLLECTIONS;
+                    message.obj = counts;
+                    handler.sendMessage(message);
+                }
+            });
 
 //            Toast.makeText(getActivity(), +"="+ BmobUser.getObjectByKey("email") +"==="+ BmobUser.getObjectByKey("desc") , Toast.LENGTH_SHORT).show();
 
@@ -265,6 +302,19 @@ public class AccountFragment extends Fragment implements View.OnClickListener{
             mUsernameTv.setText((String)BmobUser.getObjectByKey("username"));
             mDescTv.setText((String)BmobUser.getObjectByKey("desc"));
             mEmailTv.setText("邮箱 ( " + (String)BmobUser.getObjectByKey("email") + " )" );
+
+            BmobQuery<Collection> query = new BmobQuery<>();
+            query.addWhereEqualTo("userId", BmobUser.getCurrentUser().getObjectId());
+            query.addWhereEqualTo("liked", 1);
+            query.count(Collection.class, new CountListener() {
+                @Override
+                public void done(Integer counts, BmobException e) {
+                    Message message = new Message();
+                    message.what = ConstUtil.COUNT_COLLECTIONS;
+                    message.obj = counts;
+                    handler.sendMessage(message);
+                }
+            });
 
             ToolUtil.getImageFromShareToImageView(getActivity(),mProfile);
 

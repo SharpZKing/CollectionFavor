@@ -15,6 +15,7 @@
         toolbar:title="详情"
         toolbar:titleTextColor="@android:color/white"
         toolbar:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        android:theme="@style/toolbartextcolor"
         >
 
     </android.support.v7.widget.Toolbar>

@@ -1,19 +1,54 @@
 package com.sharp.collectionfavor;
 
-import android.os.Build;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
+
+import com.sharp.entity.Collection;
+import com.sharp.util.ConstUtil;
+
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.UpdateListener;
 
 public class DetailActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private WebView mWebView;
+
+    String html;
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case ConstUtil.CANCEL_COLLECTION:
+
+                    String result = (String) msg.obj;
+                    if ("OK".equals(result)){
+                        finish();
+                        Toast.makeText(DetailActivity.this, "取消收藏成功", Toast.LENGTH_SHORT).show();
+                    }else if ("NO".equals(result)){
+
+                        Toast.makeText(DetailActivity.this, "取消收藏失败", Toast.LENGTH_SHORT).show();
+                    }
+
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +68,51 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        mToolbar.inflateMenu(R.menu.item);
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.cancel_collection:
+
+                        new AlertDialog.Builder(DetailActivity.this).setTitle("取消收藏").setMessage("确定要取消此收藏吗？").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                if (!"".equals(getIntent().getStringExtra("objectId"))){
+
+                                    Collection collection = new Collection();
+                                    collection.setLiked(0);
+                                    collection.update(getIntent().getStringExtra("objectId") , new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                            Message message = new Message();
+                                            message.what = ConstUtil.CANCEL_COLLECTION;
+                                            if (e==null){
+                                                message.obj = "OK";
+                                            }else{
+                                                message.obj = "NO";
+                                            }
+                                            handler.sendMessage(message);
+                                        }
+                                    });
+
+                                }
+                            }
+                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }).create().show();
+
+
+                        break;
+                }
+                return false;
+            }
+        });
+
         mWebView = (WebView) findViewById(R.id.detail);
         final String url = getIntent().getStringExtra("url_detail");
 
@@ -48,7 +128,7 @@ public class DetailActivity extends AppCompatActivity {
         mWebView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         mWebView.getSettings().setLoadWithOverviewMode(true);
 
-        mWebView.setWebViewClient(new WebViewClient(){
+        mWebView.setWebViewClient(new WebViewClient() {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -62,6 +142,7 @@ public class DetailActivity extends AppCompatActivity {
                     }
                 }*/
                 view.loadUrl(url);
+
                 return false;
             }
 

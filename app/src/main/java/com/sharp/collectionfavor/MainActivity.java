@@ -4,17 +4,23 @@ import android.animation.Animator;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Interpolator;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -23,14 +29,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sharp.adapter.ViewPagerStateAdapter;
+import com.sharp.entity.Collection;
 import com.sharp.fragments.AccountFragment;
 import com.sharp.fragments.DiscoverFragment;
 import com.sharp.fragments.HomeFragment;
-import com.sharp.util.ToolUtil;
+import com.sharp.util.SpiderSomeInfo;
 
 import java.util.ArrayList;
-import java.util.IllegalFormatCodePointException;
 import java.util.List;
+
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobObject;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
 
 public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener{
 
@@ -45,13 +57,14 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private RadioButton mRBtn1, mRBtn2, mRBtn3;
 
     private LinearLayout mLL;
-    private RelativeLayout mRL;
+    private RelativeLayout mRL; //searchbar
     private TextView mTopLebal;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
         initDatas();
@@ -64,6 +77,13 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         mLL = (LinearLayout) findViewById(R.id.main_ll);
 //        mLL.setVisibility(View.GONE);
         mRL = (RelativeLayout) findViewById(R.id.main_top_search);
+        mRL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "搜索功能暂未开放", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         mTopLebal = (TextView) findViewById(R.id.main_top_lebal);
         setHeaderShow(0);
 
@@ -71,8 +91,90 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         mFloatingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AddCollection.class);
-                startActivity(intent);
+                /*Intent intent = new Intent(MainActivity.this, AddCollection.class);
+                startActivity(intent);*/
+                final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
+                dialog.show();
+                Window window = dialog.getWindow();
+                window.setContentView(R.layout.show_dialog);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                final EditText editText = (EditText) window.findViewById(R.id.dialog_edit);
+                final TextView yesTv = (TextView) window.findViewById(R.id.yes_add);
+                TextView noTv = (TextView) window.findViewById(R.id.no_add);
+                yesTv.setClickable(true);
+                yesTv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        yesTv.setClickable(false);
+
+                        final String  urlStr = editText.getText().toString();
+
+                        final Handler handler = new Handler(){
+                            @Override
+                            public void handleMessage(Message msg) {
+                                //super.handleMessage(msg);
+                                switch (msg.what){
+                                    case 1:
+                                        String title = (String) msg.obj;
+                                        Collection collection = new Collection();
+                                        collection.setTitle(title);
+                                        collection.setUrl(urlStr);
+                                        collection.setLiked(1);
+                                        BmobUser currentUser = BmobUser.getCurrentUser();
+
+                                        if (currentUser==null){
+                                            Toast.makeText(MainActivity.this, "添加失败，请先登入", Toast.LENGTH_SHORT).show();
+                                            break;
+                                        }
+                                        collection.setUserId(currentUser.getObjectId());
+
+                                        collection.save(new SaveListener<String>() {
+                                            @Override
+                                            public void done(String s, BmobException e) {
+                                                if (e == null){
+                                                    Toast.makeText(MainActivity.this, "成功添加至收藏!", Toast.LENGTH_SHORT).show();
+                                                }else{
+                                                    Toast.makeText(MainActivity.this, "添加至收藏夹失败", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+
+                                        dialog.dismiss();
+                                        break;
+                                }
+                            }
+                        };
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                String title = "";
+                                if ( !(urlStr.startsWith("http")||urlStr.startsWith("https"))){
+                                    title = SpiderSomeInfo.getUrlTitle("http://"+urlStr);
+                                }else{
+                                    title = SpiderSomeInfo.getUrlTitle(urlStr);
+                                }
+
+                                Message message = new Message();
+                                message.obj = title;
+                                message.what = 1;
+                                handler.sendMessage(message);
+
+                            }
+                        }).start();
+
+
+
+                    }
+                });
+
+                noTv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        Toast.makeText(MainActivity.this, "取消添加收藏成功", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
@@ -111,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 }else if(position == 1){
                     if (mLL.getVisibility() == View.GONE){
                         mLL.setVisibility(View.VISIBLE);
-                        Toast.makeText(MainActivity.this, "Gone here"+mLL.getMeasuredHeight()+"=="+mLL.getX()+"==="+mLL.getY(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this, "Gone here"+mLL.getMeasuredHeight()+"=="+mLL.getX()+"==="+mLL.getY(), Toast.LENGTH_SHORT).show();
                         /*LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mLL.getLayoutParams();
                         lp.height = mLL.getMeasuredHeight();
                         mLL.setLayoutParams(lp);*/
@@ -140,8 +242,13 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
 
             }
         });
-
-        mRBtn1.setChecked(true);
+        if (BmobUser.getCurrentUser()==null){
+            mViewPager.setCurrentItem(1);
+            setHeaderShow(1);
+            mRBtn2.setChecked(true);
+        }else{
+            mRBtn1.setChecked(true);
+        }
     }
 
     private void initDatas(){
@@ -237,11 +344,6 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         animator.start();
     }
 
-
-    /*mRecyclerView = (RecyclerView) findViewById(R.id.main_recyclerView);
-    mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-    TestRecycleViewAdapter adapter = new TestRecycleViewAdapter(this, datas);
-    mRecyclerView.setAdapter(adapter);*/
 
 
 }

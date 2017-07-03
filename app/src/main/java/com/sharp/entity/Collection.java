@@ -11,7 +11,11 @@ public class Collection extends BmobObject {
 
     private String url;
 
-    private String time;
+    private String imageUrl;
+
+    private int liked;
+
+    private String userId;
 
     public String getTitle() {
         return title;
@@ -29,11 +33,27 @@ public class Collection extends BmobObject {
         this.url = url;
     }
 
-    public String getTime() {
-        return time;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public int getLiked() {
+        return liked;
+    }
+
+    public void setLiked(int liked) {
+        this.liked = liked;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

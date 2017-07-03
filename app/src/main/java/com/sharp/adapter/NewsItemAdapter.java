@@ -2,7 +2,8 @@ package com.sharp.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.view.AsyncLayoutInflater;
+import android.graphics.Bitmap;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,21 +14,22 @@ import android.widget.Toast;
 
 import com.sharp.collectionfavor.DetailActivity;
 import com.sharp.collectionfavor.R;
-import com.sharp.entity.Collection;
+import com.sharp.entity.News;
+import com.sharp.util.LoadImages;
 
 import java.util.List;
-import java.util.zip.Inflater;
 
 /**
  * Created by zjfsharp on 2017/6/11.
  */
-public class CollectionItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class NewsItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context mContext;
-    private List<Collection> dataList;
+    private List<News> dataList;
     private LayoutInflater mLayoutInflater;
+    private Handler handler = new Handler();
 
-    public CollectionItemAdapter(Context context, List dataList){
+    public NewsItemAdapter(Context context, List dataList){
         this.mContext = context;
         this.dataList = dataList;
         mLayoutInflater = LayoutInflater.from(mContext);
@@ -35,17 +37,26 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new CollectionHolder(mLayoutInflater.inflate(R.layout.collection_item,parent, false));
+        return new NewsHolder(mLayoutInflater.inflate(R.layout.news_item,parent, false));
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        CollectionHolder mHolder = (CollectionHolder) holder;
-        Collection collection = dataList.get(position);
-        mHolder.mTitle.setText(collection.getTitle());
-        mHolder.mCreateTime.setText(collection.getCreatedAt().substring(0,10));
-        mHolder.url = collection.getUrl();
-        mHolder.objectId = collection.getObjectId();
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+        final NewsHolder mHolder = (NewsHolder) holder;
+        final News news = dataList.get(position);
+        mHolder.mTitle.setText(news.getTitle());
+//        mHolder.mCreateTime.setText(collection.getTime());
+        LoadImages loadImages = new LoadImages(news.getImageUrl());
+        loadImages.loadImage(new LoadImages.ImageCallback() {
+            @Override
+            public void getBitmap(Bitmap bitmap) {
+                mHolder.mPic.setImageBitmap(bitmap);
+            }
+        });
+
+        mHolder.url = news.getUrl();
+        mHolder.imageUrl = news.getImageUrl();
+        mHolder.liked = news.getLiked();
     }
 
     @Override
@@ -53,20 +64,22 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         return dataList.size();
     }
 
-    class CollectionHolder extends RecyclerView.ViewHolder{
+
+
+    class NewsHolder extends RecyclerView.ViewHolder{
 
         TextView mTitle;
-        TextView mCreateTime;
         ImageView mPic;
 
         String url;
-        String objectId;
+        String imageUrl;
+        int liked;
 
-        public CollectionHolder(View itemView) {
+
+        public NewsHolder(View itemView) {
             super(itemView);
-            mTitle = (TextView) itemView.findViewById(R.id.item_title);
-            mCreateTime = (TextView) itemView.findViewById(R.id.item_time);
-            mPic = (ImageView) itemView.findViewById(R.id.item_icon);
+            mTitle = (TextView) itemView.findViewById(R.id.item_discovery_title);
+            mPic = (ImageView) itemView.findViewById(R.id.item_news_icon);
 
             itemView.findViewById(R.id.item_container).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -74,7 +87,6 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 //                    Toast.makeText(mContext, "short click", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(mContext, DetailActivity.class);
                     intent.putExtra("url_detail", url);
-                    intent.putExtra("objectId", objectId);
                     mContext.startActivity(intent);
                 }
             });
